@@ -28,7 +28,13 @@ jobs:
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
         continue-on-error: false
+- name: Fix HashiCorp GPG key
+        run: |
+          wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 
+      - name: Terraform Init
+        run: terraform init -backend=false
       - name: Terraform Init
         run: terraform init -backend=false
 
