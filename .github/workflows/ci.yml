@@ -23,23 +23,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install OpenTofu
-        run: |
-          curl -fsSL https://get.opentofu.org/install-opentofu.sh | sudo bash -s -- --install-method deb
-          sudo ln -sf /usr/bin/tofu /usr/local/bin/terraform
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
 
       - name: Terraform Format Check
-        run: terraform fmt -check -recursive
+        run: tofu fmt -check -recursive
         continue-on-error: false
 
       - name: Terraform Init
-        run: terraform init -backend=false
+        run: tofu init -backend=false
 
       - name: Terraform Validate
-        run: terraform validate
+        run: tofu validate
 
       - name: Terraform Plan
-        run: terraform plan -input=false -no-color
+        run: tofu plan -input=false -no-color
         continue-on-error: true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
