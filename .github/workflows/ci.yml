@@ -23,23 +23,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Terraform
+      - name: Install OpenTofu
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gnupg software-properties-common
-          wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-          echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-          sudo apt-get update
-          sudo apt-get install -y terraform
+          curl -fsSL https://get.opentofu.org/install-opentofu.sh | sudo bash -s -- --install-method deb
+          sudo ln -sf /usr/bin/tofu /usr/local/bin/terraform
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
         continue-on-error: false
 
       - name: Terraform Init
-        run: terraform init -backend=false -lockfile=readonly || terraform init -backend=false -upgrade
-        env:
-          TF_CLI_ARGS_providers_lock: "-platform=linux_amd64"
+        run: terraform init -backend=false
 
       - name: Terraform Validate
         run: terraform validate
