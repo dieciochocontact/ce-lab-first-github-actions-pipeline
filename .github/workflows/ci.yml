@@ -32,10 +32,12 @@ jobs:
         run: terraform fmt -check -recursive
         continue-on-error: false
 
+      - name: Update HashiCorp GPG key
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --batch --yes --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
       - name: Terraform Init
         run: terraform init -backend=false
-        env:
-          TF_CLI_ARGS_init: "-upgrade"
 
       - name: Terraform Validate
         run: terraform validate
